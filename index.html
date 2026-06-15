@@ -1102,12 +1102,17 @@ footer .copyright {
 }
 
 /* ─── ANIMATION PLACEHOLDERS (GSAP Scopes) ─── */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  /* will-change is applied by GSAP only during the tween, then cleared —
-     keeping it permanent here pins a compositor layer on every reveal element
-     and causes memory-pressure scroll jank on mobile. */
+/* Hidden pre-reveal state applies on desktop only. On phones the reveal
+   animations are skipped entirely (see GSAP matchMedia below), so these
+   elements must stay visible by default — otherwise an un-fired scroll
+   trigger would leave whole sections blank on mobile.
+   will-change is intentionally omitted: GSAP applies it only during the
+   tween, then clears it; pinning it permanently caused mobile scroll jank. */
+@media (min-width: 768px) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+  }
 }
 
 /* ─── TORN PAPER SVG (Anti-Jank subpixel overlap) ─── */
@@ -1773,6 +1778,11 @@ footer .copyright {
         });
       });
 
+      // Entrance + scroll-reveal animations run on desktop only. On phones we
+      // skip them entirely so a scroll trigger that doesn't fire can never
+      // leave whole sections stuck invisible — the "no content on mobile" bug.
+      gsap.matchMedia().add('(min-width: 768px)', function () {
+
       // 2. Hero content entrance
       const heroTl = gsap.timeline();
       heroTl.from('.hero h1', {
@@ -1924,6 +1934,8 @@ footer .copyright {
       .from('.contact-inner > p', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' })
       .from('.contact-phone', { scale: 0.95, opacity: 0, duration: 0.6, ease: 'back.out(2)' }, '-=0.4')
       .from('.contact-item', { y: 20, opacity: 0, duration: 0.6, stagger: 0.15, ease: 'power2.out' }, '-=0.3');
+
+      }); // end desktop-only entrance/reveal animations
     } else {
       // Fallback: make all reveals immediately visible
       document.querySelectorAll('.reveal, .product-card, .pricing-card, .value-card, .location-card, .partner-card').forEach(el => {
