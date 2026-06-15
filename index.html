@@ -101,7 +101,7 @@ body {
   font-family: 'Lora', serif;
   color: var(--fg);
   background: var(--bg);
-  overflow-x: clip;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   touch-action: pan-y;
@@ -613,8 +613,6 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  perspective: 1200px;
-  transform-style: preserve-3d;
 }
 
 .product-slide {
@@ -628,16 +626,14 @@ section {
   box-shadow: var(--shadow-soft);
   transition: transform 0.6s var(--ease-out-expo), 
               opacity 0.6s var(--ease-out-expo), 
-              box-shadow 0.4s var(--ease-out),
-              filter 0.6s var(--ease-out-expo);
-  will-change: transform, opacity;
+              box-shadow 0.4s var(--ease-out);
   cursor: pointer;
   user-select: none;
   touch-action: pan-y;
   z-index: 1;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(0) scale(0.5) translateZ(-200px);
+  transform: translateX(0) scale(0.5);
 }
 
 /* Fallback styling when JS hasn't run yet/failed */
@@ -676,28 +672,27 @@ section {
 .product-slide.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateX(0) scale(0.5) translateZ(-200px);
+  transform: translateX(0) scale(0.5);
   z-index: 1;
 }
 
 .product-slide.far-prev {
-  opacity: 0.35;
-  transform: translateX(-120%) scale(0.65) translateZ(-150px);
+  opacity: 0.3;
+  transform: translateX(-120%) scale(0.65);
   z-index: 2;
   pointer-events: none;
-  filter: blur(1px);
 }
 
 .product-slide.prev {
   opacity: 0.75;
-  transform: translateX(-62%) scale(0.82) translateZ(-80px);
+  transform: translateX(-62%) scale(0.82);
   z-index: 5;
   pointer-events: auto;
 }
 
 .product-slide.active {
   opacity: 1;
-  transform: translateX(0) scale(1.05) translateZ(50px);
+  transform: translateX(0) scale(1.05);
   z-index: 10;
   box-shadow: var(--shadow-hover), 0 20px 50px oklch(0.22 0.035 45 / 0.22);
   pointer-events: auto;
@@ -705,17 +700,16 @@ section {
 
 .product-slide.next {
   opacity: 0.75;
-  transform: translateX(62%) scale(0.82) translateZ(-80px);
+  transform: translateX(62%) scale(0.82);
   z-index: 5;
   pointer-events: auto;
 }
 
 .product-slide.far-next {
-  opacity: 0.35;
-  transform: translateX(120%) scale(0.65) translateZ(-150px);
+  opacity: 0.3;
+  transform: translateX(120%) scale(0.65);
   z-index: 2;
   pointer-events: none;
-  filter: blur(1px);
 }
 
 .product-slide img {
@@ -801,7 +795,7 @@ section {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s var(--ease-out);
+  transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out), transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
   box-shadow: 0 2px 8px oklch(0.22 0.035 45 / 0.05);
 }
 
@@ -1320,10 +1314,10 @@ footer .copyright {
   .about-img-corner { display: none; }
   .products-slider { height: 400px; }
   .product-slide { width: 260px; height: 350px; }
-  .product-slide.prev { transform: translateX(-54%) scale(0.82) translateZ(-80px); }
-  .product-slide.next { transform: translateX(54%) scale(0.82) translateZ(-80px); }
-  .product-slide.far-prev { transform: translateX(-105%) scale(0.65) translateZ(-150px); }
-  .product-slide.far-next { transform: translateX(105%) scale(0.65) translateZ(-150px); }
+  .product-slide.prev { transform: translateX(-54%) scale(0.82); }
+  .product-slide.next { transform: translateX(54%) scale(0.82); }
+  .product-slide.far-prev { transform: translateX(-105%) scale(0.65); }
+  .product-slide.far-next { transform: translateX(105%) scale(0.65); }
   .locations-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
   .values-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; gap: 1.2rem; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
@@ -1346,10 +1340,10 @@ footer .copyright {
   .products-slider-wrapper { padding: 1.5rem 0 2rem; }
   .products-slider { height: 330px; }
   .product-slide { width: 210px; height: 280px; }
-  .product-slide.prev { transform: translateX(-46%) scale(0.82) translateZ(-80px); }
-  .product-slide.next { transform: translateX(46%) scale(0.82) translateZ(-80px); }
-  .product-slide.far-prev { transform: translateX(-88%) scale(0.65) translateZ(-150px); }
-  .product-slide.far-next { transform: translateX(88%) scale(0.65) translateZ(-150px); }
+  .product-slide.prev { transform: translateX(-46%) scale(0.82); }
+  .product-slide.next { transform: translateX(46%) scale(0.82); }
+  .product-slide.far-prev { transform: translateX(-88%) scale(0.65); }
+  .product-slide.far-next { transform: translateX(88%) scale(0.65); }
   .slider-controls { margin-top: 1rem; }
   .slider-btn { width: 44px; height: 44px; }
   .about-inner { padding: 2rem 0; }
@@ -1357,6 +1351,29 @@ footer .copyright {
   .contact-grid { gap: 2rem; }
   .partners-grid { flex-direction: column; align-items: center; }
   .partner-card { width: 100%; max-width: 320px; }
+}
+
+/* ─── MOBILE PERFORMANCE — Strip excessive GPU layers ─── */
+@media (max-width: 960px) {
+  /* On mobile Chromium (Chrome/Firefox/Brave on iOS), every will-change
+     promotes an element to its own compositing layer. Having 20+ layers
+     saturates the mobile GPU and causes scroll jank. Safari is unaffected
+     because WebKit's compositor handles this differently. Strip them all
+     on touch devices — the CSS transitions still work fine without hints. */
+  nav,
+  .nav-logo img,
+  .nav-links a,
+  .btn-primary,
+  .pricing-card,
+  .location-card,
+  .value-card,
+  .partner-card,
+  .contact-phone,
+  .floating-btn,
+  .cookie-bar,
+  .slider-btn {
+    will-change: auto;
+  }
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
