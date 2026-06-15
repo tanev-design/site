@@ -1101,19 +1101,10 @@ footer .copyright {
   background: var(--accent);
 }
 
-/* ─── ANIMATION PLACEHOLDERS (GSAP Scopes) ─── */
-/* Hidden pre-reveal state applies on desktop only. On phones the reveal
-   animations are skipped entirely (see GSAP matchMedia below), so these
-   elements must stay visible by default — otherwise an un-fired scroll
-   trigger would leave whole sections blank on mobile.
-   will-change is intentionally omitted: GSAP applies it only during the
-   tween, then clears it; pinning it permanently caused mobile scroll jank. */
-@media (min-width: 768px) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-}
+/* ─── ANIMATION PLACEHOLDERS ─── */
+/* .reveal no longer hides anything: all content loads at the same time on
+   every viewport. Kept as a hook in case entrance animations are reintroduced. */
+.reveal { opacity: 1; transform: none; }
 
 /* ─── TORN PAPER SVG (Anti-Jank subpixel overlap) ─── */
 .section-torn-top {
@@ -1655,9 +1646,10 @@ footer .copyright {
     </div>
   </div>
 </div>
-<!-- GSAP & ScrollTrigger Core Library CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- Scroll/entrance animations intentionally disabled: every section now loads
+     at the same time (no staggered reveals), and dropping the GSAP CDN
+     (~110 KB) makes the page load faster. The inline script below detects that
+     GSAP is absent and renders all content immediately. -->
 
 <script>
 (function () {
