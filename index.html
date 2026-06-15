@@ -597,78 +597,235 @@ section {
   margin: 0 auto;
 }
 
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
-  gap: 1.25rem;
-  margin-top: var(--space-xs);
+/* ─── PRODUCTS CAROUSEL ─── */
+.products-slider-wrapper {
+  position: relative;
+  width: 100%;
+  margin: var(--space-md) auto 0;
+  overflow: hidden;
+  padding: 2.5rem 0 3.5rem;
 }
 
-.product-card {
+.products-slider {
   position: relative;
+  height: 480px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.product-slide {
+  position: absolute;
+  width: 320px;
+  height: 420px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  cursor: pointer;
-  aspect-ratio: 1;
-  box-shadow: var(--shadow-soft);
-  transition: box-shadow 0.4s var(--ease-out), transform 0.4s var(--ease-out);
-  background-color: var(--muted);
+  background-color: var(--card);
   border: 1px solid var(--border);
-  will-change: transform, box-shadow;
-}
-.product-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-3px);
-}
-.product-card img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.8s var(--ease-out);
-  display: block;
-}
-.product-card:hover img { transform: scale(1.06); }
-
-.product-card .overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, oklch(0.22 0.03 45 / 0.85) 0%, oklch(0.22 0.03 45 / 0.15) 50%, transparent 70%);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.6s var(--ease-out-expo), 
+              opacity 0.6s var(--ease-out-expo), 
+              box-shadow 0.4s var(--ease-out),
+              filter 0.6s var(--ease-out-expo);
+  will-change: transform, opacity;
+  cursor: pointer;
+  user-select: none;
+  touch-action: pan-y;
+  z-index: 1;
   opacity: 0;
-  transition: opacity 0.4s var(--ease-out);
-  display: flex;
-  align-items: flex-end;
-  padding: var(--space-sm);
-}
-.product-card:hover .overlay { opacity: 1; }
-.product-card .overlay span {
-  color: oklch(1 0 0);
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  transform: translateY(10px);
-  transition: transform 0.4s var(--ease-out);
-  text-shadow: 0 1px 10px rgba(0,0,0,0.3);
-}
-.product-card:hover .overlay span { transform: translateY(0); }
-
-/* Wheat watermark on card */
-.product-card::before {
-  content: '';
-  position: absolute;
-  bottom: 10px; right: 10px;
-  width: 60px; height: 60px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12M12 12C12 12 8 10 5 6M12 12C12 12 16 10 19 6M12 12C12 12 10 8 10 4M12 12C12 12 14 8 14 4'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.06;
   pointer-events: none;
+  transform: translateX(0) scale(0.5) translateZ(-200px);
+}
+
+/* Fallback styling when JS hasn't run yet/failed */
+.products-slider-wrapper:not(.js-initialized) {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+}
+.products-slider-wrapper:not(.js-initialized) .products-slider {
+  display: flex;
+  gap: 1.5rem;
+  height: auto;
+  justify-content: flex-start;
+  padding: 1rem;
+  width: max-content;
+  margin: 0 auto;
+  perspective: none;
+}
+.products-slider-wrapper:not(.js-initialized) .product-slide {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  flex-shrink: 0;
+}
+.products-slider-wrapper:not(.js-initialized) .slider-controls {
+  display: none;
+}
+
+/* Carousel layouts when JS is initialized successfully */
+.js-initialized .product-slide {
+  position: absolute;
+}
+
+/* State Classes set by JS */
+.product-slide.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0) scale(0.5) translateZ(-200px);
   z-index: 1;
 }
 
-.product-card.hero-card {
-  grid-column: span 2;
-  grid-row: span 2;
-  aspect-ratio: auto;
+.product-slide.far-prev {
+  opacity: 0.35;
+  transform: translateX(-120%) scale(0.65) translateZ(-150px);
+  z-index: 2;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.product-slide.prev {
+  opacity: 0.75;
+  transform: translateX(-62%) scale(0.82) translateZ(-80px);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.product-slide.active {
+  opacity: 1;
+  transform: translateX(0) scale(1.05) translateZ(50px);
+  z-index: 10;
+  box-shadow: var(--shadow-hover), 0 20px 50px oklch(0.22 0.035 45 / 0.22);
+  pointer-events: auto;
+}
+
+.product-slide.next {
+  opacity: 0.75;
+  transform: translateX(62%) scale(0.82) translateZ(-80px);
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.product-slide.far-next {
+  opacity: 0.35;
+  transform: translateX(120%) scale(0.65) translateZ(-150px);
+  z-index: 2;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.product-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.product-slide.active:hover img {
+  transform: scale(1.04);
+}
+
+.product-slide .slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, oklch(0.22 0.03 45 / 0.85) 0%, oklch(0.22 0.03 45 / 0.15) 50%, transparent 75%);
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-sm) var(--space-md);
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.product-slide .slide-overlay span {
+  color: oklch(1 0 0);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.5s var(--ease-out-expo), opacity 0.5s var(--ease-out);
+  transform: translateY(4px);
+}
+
+.product-slide:not(.active) .slide-overlay {
+  background: linear-gradient(to top, oklch(0.22 0.03 45 / 0.6) 0%, oklch(0.22 0.03 45 / 0.1) 50%, transparent 75%);
+}
+.product-slide:not(.active) .slide-overlay span {
+  opacity: 0.65;
+  transform: scale(0.95) translateY(0);
+}
+
+.product-slide.active .slide-overlay span {
+  transform: translateY(0);
+}
+
+.product-slide::before {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V12M12 12C12 12 8 10 5 6M12 12C12 12 16 10 19 6M12 12C12 12 10 8 10 4M12 12C12 12 14 8 14 4'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.4s var(--ease-out);
+}
+.product-slide:not(.active)::before {
+  opacity: 0.03;
+}
+
+.slider-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: 1.5rem;
+}
+
+.slider-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  box-shadow: 0 2px 8px oklch(0.22 0.035 45 / 0.05);
+}
+
+.slider-btn:hover {
+  background: var(--accent);
+  color: var(--accent-fg);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-gold);
+}
+
+.slider-btn:active {
+  transform: scale(0.95);
+}
+
+.slider-btn svg {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.prev-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+.next-btn:hover svg {
+  transform: translateX(2px);
 }
 
 /* ─── PRICING ─── */
@@ -1161,8 +1318,12 @@ footer .copyright {
 
   .about-inner { grid-template-columns: 1fr; gap: 2.5rem; }
   .about-img-corner { display: none; }
-  .products-grid { grid-template-columns: 1fr 1fr; }
-  .product-card.hero-card { grid-column: span 2; grid-row: span 1; aspect-ratio: 16/9; }
+  .products-slider { height: 400px; }
+  .product-slide { width: 260px; height: 350px; }
+  .product-slide.prev { transform: translateX(-54%) scale(0.82) translateZ(-80px); }
+  .product-slide.next { transform: translateX(54%) scale(0.82) translateZ(-80px); }
+  .product-slide.far-prev { transform: translateX(-105%) scale(0.65) translateZ(-150px); }
+  .product-slide.far-next { transform: translateX(105%) scale(0.65) translateZ(-150px); }
   .locations-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
   .values-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; gap: 1.2rem; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
@@ -1182,9 +1343,15 @@ footer .copyright {
   .hero-tagline { display: none; }
   .btn-primary { width: 100%; max-width: 300px; justify-content: center; }
   
-  .products-grid { grid-template-columns: 1fr; gap: 0.8rem; }
-  .product-card.hero-card { grid-column: span 1; aspect-ratio: 4/3; }
-  .product-card { aspect-ratio: 4/3; }
+  .products-slider-wrapper { padding: 1.5rem 0 2rem; }
+  .products-slider { height: 330px; }
+  .product-slide { width: 210px; height: 280px; }
+  .product-slide.prev { transform: translateX(-46%) scale(0.82) translateZ(-80px); }
+  .product-slide.next { transform: translateX(46%) scale(0.82) translateZ(-80px); }
+  .product-slide.far-prev { transform: translateX(-88%) scale(0.65) translateZ(-150px); }
+  .product-slide.far-next { transform: translateX(88%) scale(0.65) translateZ(-150px); }
+  .slider-controls { margin-top: 1rem; }
+  .slider-btn { width: 44px; height: 44px; }
   .about-inner { padding: 2rem 0; }
   .about-img-frame img { height: 280px; }
   .contact-grid { gap: 2rem; }
@@ -1396,30 +1563,45 @@ footer .copyright {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-.5 2-1 4-2 6C8 11 6 12 4 12c2 0 4 1 6 2 1 2 2 4 2 6 0-2 1-4 2-6 2-1 4-2 6-2-2 0-4-1-6-2-1-2-2-4-2-6z"/></svg>
       <span class="line right"></span>
     </div>
-    <div class="products-grid">
-      <div class="product-card hero-card reveal">
-        <img src="1.jpg" alt="Питки със сусам" decoding="async">
-        <div class="overlay"><span>Питки със сусам</span></div>
+    <div class="products-slider-wrapper">
+      <div class="products-slider" id="productsSlider">
+        <div class="product-slide" data-index="0">
+          <img src="1.jpg" alt="Питки със сусам" decoding="async">
+          <div class="slide-overlay"><span>Питки със сусам</span></div>
+        </div>
+        <div class="product-slide" data-index="1">
+          <img src="2.jpg" alt="Бутер баници" decoding="async">
+          <div class="slide-overlay"><span>Бутер баници</span></div>
+        </div>
+        <div class="product-slide" data-index="2">
+          <img src="3.jpg" alt="Триъгълни баници" decoding="async">
+          <div class="slide-overlay"><span>Триъгълни баници</span></div>
+        </div>
+        <div class="product-slide" data-index="3">
+          <img src="4.jpg" alt="Мит с кренвирш" decoding="async">
+          <div class="slide-overlay"><span>Мит с кренвирш</span></div>
+        </div>
+        <div class="product-slide" data-index="4">
+          <img src="5.jpg" alt="Руло баници" decoding="async">
+          <div class="slide-overlay"><span>Руло баници</span></div>
+        </div>
+        <div class="product-slide" data-index="5">
+          <img src="6.jpg" alt="Калцоне" decoding="async">
+          <div class="slide-overlay"><span>Калцоне</span></div>
+        </div>
       </div>
-      <div class="product-card reveal reveal-delay-1">
-        <img src="2.jpg" alt="Бутер баници" decoding="async">
-        <div class="overlay"><span>Бутер баници</span></div>
-      </div>
-      <div class="product-card reveal reveal-delay-2">
-        <img src="3.jpg" alt="Триъгълни баници" decoding="async">
-        <div class="overlay"><span>Триъгълни баници</span></div>
-      </div>
-      <div class="product-card reveal reveal-delay-1">
-        <img src="4.jpg" alt="Мит с кренвирш" decoding="async">
-        <div class="overlay"><span>Мит с кренвирш</span></div>
-      </div>
-      <div class="product-card reveal reveal-delay-2">
-        <img src="5.jpg" alt="Руло баници" decoding="async">
-        <div class="overlay"><span>Руло баници</span></div>
-      </div>
-      <div class="product-card reveal reveal-delay-3">
-        <img src="6.jpg" alt="Калцоне" decoding="async">
-        <div class="overlay"><span>Калцоне</span></div>
+
+      <div class="slider-controls">
+        <button class="slider-btn prev-btn" id="prevBtn" aria-label="Предишен продукт">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="slider-btn next-btn" id="nextBtn" aria-label="Следващ продукт">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -1739,6 +1921,107 @@ footer .copyright {
     cookieBar.classList.toggle('active');
   });
 
+  // ── Products Coverflow Slider ──
+  (function initProductsSlider() {
+    const sliderWrapper = document.querySelector('.products-slider-wrapper');
+    const slider = document.getElementById('productsSlider');
+    const slides = Array.from(document.querySelectorAll('.product-slide'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (!slider || slides.length === 0) return;
+    
+    let activeIndex = 0;
+    const totalSlides = slides.length;
+    
+    // Enable slider layout and styling
+    sliderWrapper.classList.add('js-initialized');
+    
+    function getDiff(i, activeIdx, total) {
+      let diff = i - activeIdx;
+      while (diff < -total / 2) diff += total;
+      while (diff > total / 2) diff -= total;
+      return diff;
+    }
+    
+    function updateSlider() {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active', 'prev', 'next', 'far-prev', 'far-next', 'hidden');
+        
+        const diff = getDiff(i, activeIndex, totalSlides);
+        
+        if (diff === 0) {
+          slide.classList.add('active');
+        } else if (diff === 1) {
+          slide.classList.add('next');
+        } else if (diff === -1) {
+          slide.classList.add('prev');
+        } else if (diff === 2) {
+          slide.classList.add('far-next');
+        } else if (diff === -2) {
+          slide.classList.add('far-prev');
+        } else {
+          slide.classList.add('hidden');
+        }
+      });
+    }
+    
+    function nextSlide() {
+      activeIndex = (activeIndex + 1) % totalSlides;
+      updateSlider();
+    }
+    
+    function prevSlide() {
+      activeIndex = (activeIndex - 1 + totalSlides) % totalSlides;
+      updateSlider();
+    }
+    
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+    
+    slides.forEach((slide) => {
+      slide.addEventListener('click', () => {
+        const index = parseInt(slide.getAttribute('data-index'), 10);
+        if (index === activeIndex) return;
+        
+        const diff = getDiff(index, activeIndex, totalSlides);
+        if (Math.abs(diff) <= 2) {
+          activeIndex = index;
+          updateSlider();
+        }
+      });
+    });
+    
+    // Swipe gestures
+    let startX = 0;
+    let isMoving = false;
+    
+    slider.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isMoving = true;
+    }, { passive: true });
+    
+    slider.addEventListener('touchmove', (e) => {
+      if (!isMoving) return;
+      const currentX = e.touches[0].clientX;
+      const diffX = currentX - startX;
+      
+      if (diffX > 55) {
+        prevSlide();
+        isMoving = false;
+      } else if (diffX < -55) {
+        nextSlide();
+        isMoving = false;
+      }
+    }, { passive: true });
+    
+    slider.addEventListener('touchend', () => {
+      isMoving = false;
+    }, { passive: true });
+    
+    updateSlider();
+  }());
+
   // ── GSAP & ScrollTrigger Animations (Optimized for all viewports) ──
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
@@ -1845,16 +2128,15 @@ footer .copyright {
         ease: 'power2.out'
       }, '-=0.7');
 
-      // 5. Products stagger
-      gsap.from('.product-card', {
-        y: 50,
+      // 5. Products slider entrance
+      gsap.from('.products-slider-wrapper', {
+        y: 40,
         opacity: 0,
-        duration: 0.85,
-        stagger: 0.1,
+        duration: 0.9,
         ease: 'power3.out',
         scrollTrigger: {
-          trigger: '.products-grid',
-          start: 'top 80%',
+          trigger: '.products-slider-wrapper',
+          start: 'top 85%',
           toggleActions: 'play none none none'
         }
       });
@@ -1930,14 +2212,14 @@ footer .copyright {
       }); // end desktop-only entrance/reveal animations
     } else {
       // Fallback: make all reveals immediately visible
-      document.querySelectorAll('.reveal, .product-card, .pricing-card, .value-card, .location-card, .partner-card').forEach(el => {
+      document.querySelectorAll('.reveal, .pricing-card, .value-card, .location-card, .partner-card').forEach(el => {
         el.style.opacity = '1';
         el.style.transform = 'none';
       });
     }
   } else {
     // Fallback if GSAP is not loaded
-    document.querySelectorAll('.reveal, .product-card, .pricing-card, .value-card, .location-card, .partner-card').forEach(el => {
+    document.querySelectorAll('.reveal, .pricing-card, .value-card, .location-card, .partner-card').forEach(el => {
       el.style.opacity = '1';
       el.style.transform = 'none';
     });
