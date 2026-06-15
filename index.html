@@ -4,11 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Пекарни Сиана — Семейни пекарни</title>
+<meta name="description" content="Семейни пекарни Сиана — топли закуски, изпечени на място. Традиция и вкус във всяка хапка.">
+<meta name="theme-color" content="#2e2014">
 <link rel="icon" type="image/png" href="logo.png">
-<meta property="og:image" content="logo.png">
-<meta property="og:title" content="Пекарни Сиана — Семейни пекарни">
-<meta property="og:description" content="Семейни пекарни Сиана — Топли закуски, изпечени на място. Традиция и вкус във всяка хапка.">
+<link rel="canonical" href="https://pekarnisiana.com/">
+
+<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Пекарни Сиана">
+<meta property="og:locale" content="bg_BG">
+<meta property="og:url" content="https://pekarnisiana.com/">
+<meta property="og:title" content="Пекарни Сиана — Семейни пекарни">
+<meta property="og:description" content="Топли закуски, изпечени на място. Традиция и вкус във всяка хапка.">
+<meta property="og:image" content="https://pekarnisiana.com/og-image.jpg">
+<meta property="og:image:secure_url" content="https://pekarnisiana.com/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Пекарни Сиана — семейни пекарни, топли закуски изпечени на място">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Пекарни Сиана — Семейни пекарни">
+<meta name="twitter:description" content="Топли закуски, изпечени на място. Традиция и вкус във всяка хапка.">
+<meta name="twitter:image" content="https://pekarnisiana.com/og-image.jpg">
+<meta name="twitter:image:alt" content="Пекарни Сиана — семейни пекарни">
 
 <!-- Preconnect to fonts CDNs with crossorigin to prevent FOUT layout shift -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1085,7 +1105,9 @@ footer .copyright {
 .reveal {
   opacity: 0;
   transform: translateY(30px);
-  will-change: transform, opacity;
+  /* will-change is applied by GSAP only during the tween, then cleared —
+     keeping it permanent here pins a compositor layer on every reveal element
+     and causes memory-pressure scroll jank on mobile. */
 }
 
 /* ─── TORN PAPER SVG (Anti-Jank subpixel overlap) ─── */
@@ -1108,7 +1130,15 @@ footer .copyright {
 /* ─── RESPONSIVE — Tablet ─── */
 @media (max-width: 960px) {
   nav { justify-content: space-between; padding: 1rem 1.5rem; }
-  nav.scrolled { padding: 0.85rem 1.5rem; }
+  /* Drop the live backdrop blur on touch breakpoints — re-blurring the content
+     behind a scroll-pinned bar every frame is a major scroll-jank source on
+     mobile Chromium. The bar is already ~opaque, so go fully solid instead. */
+  nav.scrolled {
+    padding: 0.85rem 1.5rem;
+    background: oklch(0.99 0.006 65 / 1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
   .nav-logo { height: 50px; }
   .hamburger { display: flex; }
   .nav-links {
@@ -1716,20 +1746,31 @@ footer .copyright {
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 
+    // Stop Chromium mobile browsers (Chrome, Edge, Samsung, Brave) from janking:
+    // showing/hiding the address bar fires a viewport resize that would otherwise
+    // force ScrollTrigger to recalculate every trigger mid-scroll, jumping the layout.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    // Re-measure once the hero image and fonts have settled so triggers fire accurately.
+    window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!prefersReducedMotion) {
-      // 1. Hero background parallax
-      gsap.to('.hero-bg img', {
-        yPercent: 12,
-        scale: 1.08,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.hero',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true
-        }
+      // 1. Hero background parallax — desktop only.
+      // Scroll-scrubbed transforms on the large hero image are the biggest source
+      // of scroll jank on mobile, so we only run it on wider, pointer-fine screens.
+      gsap.matchMedia().add('(min-width: 768px) and (pointer: fine)', function () {
+        gsap.to('.hero-bg img', {
+          yPercent: 12,
+          scale: 1.08,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.hero',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true
+          }
+        });
       });
 
       // 2. Hero content entrance
