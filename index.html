@@ -370,19 +370,24 @@ nav.scrolled .hamburger span { background: var(--fg); }
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
   font-family: 'Lora', serif;
-  font-size: var(--font-xs);
-  letter-spacing: 4px;
+  font-size: 0.82rem;
+  letter-spacing: 3.5px;
   text-transform: uppercase;
-  color: var(--tertiary);
+  color: oklch(0.93 0.07 78);
   margin-bottom: 1.5rem;
   font-style: italic;
+  font-weight: 500;
+  text-shadow:
+    0 1px 4px rgba(0,0,0,0.55),
+    0 2px 12px oklch(0.18 0.02 45 / 0.7);
 }
 .hero-badge::before, .hero-badge::after {
   content: '';
   width: 40px; height: 1px;
-  background: oklch(0.81 0.09 72 / 0.6);
+  background: oklch(0.93 0.08 78 / 0.85);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
 .hero h1 {
@@ -405,14 +410,16 @@ nav.scrolled .hamburger span { background: var(--fg); }
 
 .hero-tagline {
   font-size: var(--font-lg);
-  color: oklch(1 0 0 / 0.88);
+  color: oklch(1 0 0 / 0.95);
   font-style: italic;
-  line-height: 1.7;
+  line-height: 1.65;
   margin-bottom: 2.2rem;
-  max-width: 480px;
+  max-width: 500px;
   margin-left: auto;
   margin-right: auto;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  text-shadow:
+    0 1px 4px rgba(0,0,0,0.7),
+    0 2px 16px oklch(0.14 0.02 45 / 0.6);
 }
 
 .btn-primary {
@@ -1338,7 +1345,12 @@ footer .copyright {
   .hero-content { max-width: 100%; }
   .hero-badge { display: none; }
   .hero h1 { letter-spacing: -0.01em; }
-  .hero-tagline { display: none; }
+  .hero-tagline {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    margin-bottom: 1.8rem;
+    max-width: 340px;
+  }
   .btn-primary { width: 100%; max-width: 300px; justify-content: center; }
   
   .products-slider-wrapper { padding: 1.5rem 0 2rem; }
@@ -1581,7 +1593,7 @@ body.loading {
   <div class="hero-content">
     <div class="hero-badge">Семейни пекарни · от сърце</div>
     <h1>Пекарни<br><em>Сиана</em></h1>
-    <p class="hero-tagline">Топли закуски, изпечени на място. Традиция и вкус във всяка хапка.</p>
+    <p class="hero-tagline">Топъл хляб и закуски, изпечени на място всяка сутрин — с любов и традиция.</p>
     <a href="#products" class="btn-primary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
       Вижте нашите продукти
